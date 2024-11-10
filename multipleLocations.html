@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple Locations Map</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .location-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        .location-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .location-item:hover {
+            background-color: #f5f5f5;
+        }
+        .location-item.active {
+            background-color: #e5e7eb;
+            border-left: 4px solid #2563eb;
+        }
+        .name {
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 4px;
+        }
+        .address {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .map-container {
+            height: 600px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .location-list {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <h2>Locations</h2>
+            <ul class="location-list" id="locationList">
+                <li class="location-item" data-lat="40.7128" data-lng="-74.0060" onclick="highlightLocation(this)">
+                    <div class="name">John Smith</div>
+                    <div class="address">123 Main St, New York, NY</div>
+                </li>
+                <li class="location-item" data-lat="37.7749" data-lng="-122.4194" onclick="highlightLocation(this)">
+                    <div class="name">Sarah Johnson</div>
+                    <div class="address">456 Market St, San Francisco, CA</div>
+                </li>
+                <li class="location-item" data-lat="41.8781" data-lng="-87.6298" onclick="highlightLocation(this)">
+                    <div class="name">Michael Brown</div>
+                    <div class="address">789 State St, Chicago, IL</div>
+                </li>
+                <li class="location-item" data-lat="34.0522" data-lng="-118.2437" onclick="highlightLocation(this)">
+                    <div class="name">Emma Davis</div>
+                    <div class="address">321 Spring St, Los Angeles, CA</div>
+                </li>
+                <li class="location-item" data-lat="29.7604" data-lng="-95.3698" onclick="highlightLocation(this)">
+                    <div class="name">James Wilson</div>
+                    <div class="address">567 Oak St, Houston, TX</div>
+                </li>
+            </ul>
+        </div>
+        <div class="map-container">
+            <iframe 
+                id="map"
+                src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=United+States&zoom=4"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <script>
+        function highlightLocation(element) {
+            // Remove active class from all items
+            document.querySelectorAll('.location-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            element.classList.add('active');
+            
+            // Get coordinates
+            const lat = element.dataset.lat;
+            const lng = element.dataset.lng;
+            
+            // Update map to center on selected location
+            const map = document.getElementById('map');
+            map.src = `https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${lat},${lng}&zoom=14`;
+        }
+
+        // Function to initialize map with all markers
+        function initializeMap() {
+            const locations = Array.from(document.querySelectorAll('.location-item')).map(item => ({
+                lat: item.dataset.lat,
+                lng: item.dataset.lng,
+                name: item.querySelector('.name').textContent
+            }));
+            
+            // Create URL for map with all markers
+            const markers = locations.map(loc => 
+                `markers=${loc.lat},${loc.lng}`
+            ).join('&');
+            
+            const map = document.getElementById('map');
+            map.src = `https://www.google.com/maps/embed/v1/view?key=YOUR_GOOGLE_MAPS_API_KEY&center=39.8283,-98.5795&zoom=4&${markers}`;
+        }
+
+        // Initialize map when page loads
+        window.onload = initializeMap;
+    </script>
+</body>
+</html>
